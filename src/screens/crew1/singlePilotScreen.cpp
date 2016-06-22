@@ -5,6 +5,7 @@
 
 #include "screenComponents/viewport3d.h"
 
+#include "screenComponents/alertOverlay.h"
 #include "screenComponents/combatManeuver.h"
 #include "screenComponents/radarView.h"
 #include "screenComponents/impulseControls.h"
@@ -35,9 +36,15 @@ SinglePilotScreen::SinglePilotScreen(GuiContainer* owner)
     left_panel = new GuiElement(this, "LEFT_PANEL");
     left_panel->setPosition(0, 0, ATopLeft)->setSize(1000, GuiElement::GuiSizeMax);
 
-    // Draw background textures in the left panel.
-    (new GuiOverlay(left_panel, "", sf::Color::White))->setTextureCenter("gui/BackgroundGradientSingle");
-    (new GuiOverlay(left_panel, "", sf::Color::White))->setTextureTiled("gui/BackgroundCrosses");
+    // Render the radar shadow and background decorations.
+    background_gradient = new GuiOverlay(left_panel, "BACKGROUND_GRADIENT", sf::Color::White);
+    background_gradient->setTextureCenter("gui/BackgroundGradientSingle");
+
+    background_crosses = new GuiOverlay(left_panel, "BACKGROUND_CROSSES", sf::Color::White);
+    background_crosses->setTextureTiled("gui/BackgroundCrosses");
+
+    // Render the alert level color overlay.
+    (new AlertLevelOverlay(this));
 
     // 5U tactical radar with piloting features.
     radar = new GuiRadarView(left_panel, "TACTICAL_RADAR", 5000.0, &targets);
@@ -84,10 +91,6 @@ SinglePilotScreen::SinglePilotScreen(GuiContainer* owner)
     tube_controls->setPosition(20, -20, ABottomLeft);
     radar->enableTargetProjections(tube_controls);
 
-    // Missile lock button near top right of left panel.
-    lock_aim = new AimLockButton(left_panel, "LOCK_AIM", tube_controls, missile_aim);
-    lock_aim->setPosition(300, 130, ATopCenter)->setSize(130, 50);
-
     // Engine layout in top left corner of left panel.
     GuiAutoLayout* engine_layout = new GuiAutoLayout(left_panel, "ENGINE_LAYOUT", GuiAutoLayout::LayoutHorizontalLeftToRight);
     engine_layout->setPosition(20, 80, ATopLeft)->setSize(GuiElement::GuiSizeMax, 250);
@@ -100,6 +103,10 @@ SinglePilotScreen::SinglePilotScreen(GuiContainer* owner)
     (new GuiOpenCommsButton(left_panel, "OPEN_COMMS_BUTTON", &targets))->setPosition(270, 20, ATopLeft)->setSize(250, 50);
     (new GuiCommsOverlay(this))->setSize(GuiElement::GuiSizeMax, GuiElement::GuiSizeMax);
     (new GuiShieldsEnableButton(left_panel, "SHIELDS_ENABLE"))->setPosition(520, 20, ATopLeft)->setSize(250, 50);
+
+    // Missile lock button near top right of left panel.
+    lock_aim = new AimLockButton(left_panel, "LOCK_AIM", tube_controls, missile_aim);
+    lock_aim->setPosition(250, 70, ATopCenter)->setSize(130, 50);
 }
 
 void SinglePilotScreen::onDraw(sf::RenderTarget& window)
@@ -115,6 +122,9 @@ void SinglePilotScreen::onDraw(sf::RenderTarget& window)
         jump_controls->setVisible(my_spaceship->has_jump_drive);
 
         shields_display->setValue(string(my_spaceship->getShieldPercentage(0)) + "% " + string(my_spaceship->getShieldPercentage(1)) + "%");
+
+        missile_aim->setVisible(tube_controls->getManualAim());
+
         targets.set(my_spaceship->getTarget());
     }
     GuiOverlay::onDraw(window);

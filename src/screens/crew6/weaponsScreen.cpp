@@ -18,8 +18,14 @@
 WeaponsScreen::WeaponsScreen(GuiContainer* owner)
 : GuiOverlay(owner, "WEAPONS_SCREEN", colorConfig.background)
 {
-    (new GuiOverlay(this, "", sf::Color::White))->setTextureCenter("gui/BackgroundGradient");
-    (new GuiOverlay(this, "", sf::Color::White))->setTextureTiled("gui/BackgroundCrosses");
+    // Render the radar shadow and background decorations.
+    background_gradient = new GuiOverlay(this, "BACKGROUND_GRADIENT", sf::Color::White);
+    background_gradient->setTextureCenter("gui/BackgroundGradient");
+
+    background_crosses = new GuiOverlay(this, "BACKGROUND_CROSSES", sf::Color::White);
+    background_crosses->setTextureTiled("gui/BackgroundCrosses");
+
+    // Render the alert level color overlay.
     (new AlertLevelOverlay(this));
 
     radar = new GuiRadarView(this, "HELMS_RADAR", 5000.0, &targets);
@@ -44,7 +50,7 @@ WeaponsScreen::WeaponsScreen(GuiContainer* owner)
     radar->enableTargetProjections(tube_controls);
 
     lock_aim = new AimLockButton(this, "LOCK_AIM", tube_controls, missile_aim);
-    lock_aim->setPosition(300, 50, ATopCenter)->setSize(130, 50);
+    lock_aim->setPosition(250, 20, ATopCenter)->setSize(130, 50);
 
     if (gameGlobalInfo->use_beam_shield_frequencies || gameGlobalInfo->use_system_damage)
     {

@@ -33,6 +33,8 @@ GameGlobalInfo::GameGlobalInfo()
     use_system_damage = true;
     allow_main_screen_tactical_radar = true;
     allow_main_screen_long_range_radar = true;
+    
+    intercept_all_comms_to_gm = false;
 
     registerMemberReplication(&scanning_complexity);
     registerMemberReplication(&global_message);
@@ -204,7 +206,7 @@ string getSectorName(sf::Vector2f position)
     if (sector_y >= 0)
         y = string(char('A' + (sector_y)));
     else
-        y = string(char('z' + 1 + sector_y)) + string(char('z' + 1 + sector_y));
+        y = string(char('z' + sector_y / 20)) + string(char('z' + 1 + (sector_y % 26)));
     if (sector_x >= 0)
         x = string(sector_x);
     else

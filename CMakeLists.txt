@@ -57,6 +57,7 @@ set(SOURCES
 	src/missileWeaponData.cpp
 	src/factionInfo.cpp
 	src/mesh.cpp
+	src/scenarioInfo.cpp
 	src/repairCrew.cpp
 	src/GMScriptCallback.cpp
 	src/tutorialGame.cpp
@@ -125,6 +126,7 @@ set(SOURCES
 	src/screenComponents/mainScreenControls.cpp
 	src/screenComponents/databaseView.cpp
 	src/screenComponents/shipsLogControl.cpp
+	src/screenComponents/onScreenKeyboard.cpp
 	src/gui/colorConfig.cpp
 	src/gui/mouseRenderer.cpp
 	src/gui/scriptError.cpp

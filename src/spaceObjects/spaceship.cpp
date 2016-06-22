@@ -366,6 +366,17 @@ void SpaceShip::update(float delta)
             }else{
                 setPosition(docking_target->getPosition() + sf::rotateVector(docking_offset, docking_target->getRotation()));
                 target_rotation = sf::vector2ToAngle(getPosition() - docking_target->getPosition());
+
+                P<ShipTemplateBasedObject> docked_with_template_based = docking_target;
+                if (docked_with_template_based && docked_with_template_based->repair_docked)  //Check if what we are docked to allows hull repairs, and if so, do it.
+                {
+                    if (hull_strength < hull_max)
+                    {
+                        hull_strength += delta;
+                        if (hull_strength > hull_max)
+                            hull_strength = hull_max;
+                    }
+                }
             }
             impulse_request = 0.0;
         }
@@ -630,7 +641,7 @@ void SpaceShip::requestDock(P<SpaceObject> target)
 
 void SpaceShip::requestUndock()
 {
-    if (docking_state == DS_Docked)
+    if (docking_state == DS_Docked && getSystemEffectiveness(SYS_Impulse) > 0.1)
     {
         docking_state = DS_NotDocking;
         impulse_request = 0.5;
@@ -760,7 +771,7 @@ float SpaceShip::getShieldDamageFactor(DamageInfo& info, int shield_index)
     float shield_damage_exponent = 1.6;
     float shield_damage_divider = 7.0;
     float shield_damage_factor = 1.0 + powf(1.0, shield_damage_exponent) / shield_damage_divider-powf(getSystemEffectiveness(system), shield_damage_exponent) / shield_damage_divider;
-    
+
     return shield_damage_factor * frequency_damage_factor;
 }
 

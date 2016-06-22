@@ -9,6 +9,8 @@
 #include "gui/gui2_listbox.h"
 #include "gui/gui2_textentry.h"
 
+#include "onScreenKeyboard.h"
+
 GuiCommsOverlay::GuiCommsOverlay(GuiContainer* owner)
 : GuiElement(owner, "COMMS_OVERLAY")
 {
@@ -55,7 +57,7 @@ GuiCommsOverlay::GuiCommsOverlay(GuiContainer* owner)
     (new GuiButton(no_response_box, "COMMS_NO_REPLY_OK", "Ok", []() {
         if (my_spaceship)
             my_spaceship->commandCloseTextComm();
-    }))->setSize(150, 50)->setPosition(-20, -10, ABottomRight);
+    }))->setSize(100, 50)->setPosition(-20, -10, ABottomRight);
 
     // Panel for broken communications.
     broken_box = new GuiPanel(owner, "COMMS_BROKEN_BOX");
@@ -66,18 +68,18 @@ GuiCommsOverlay::GuiCommsOverlay(GuiContainer* owner)
     (new GuiButton(broken_box, "COMMS_BROKEN_OK", "Ok", []() {
         if (my_spaceship)
             my_spaceship->commandCloseTextComm();
-    }))->setSize(150, 50)->setPosition(-20, -10, ABottomRight);
+    }))->setSize(100, 50)->setPosition(-20, -10, ABottomRight);
 
     // Panel for communications closed by the other object.
     closed_box = new GuiPanel(owner, "COMMS_CLOSED_BOX");
     closed_box->hide()->setSize(800, 70)->setPosition(0, -250, ABottomCenter);
-    (new GuiLabel(closed_box, "COMMS_BROKEN_LABEL", "Other party closed communications", 40))->setSize(GuiElement::GuiSizeMax, GuiElement::GuiSizeMax)->setPosition(0, 0, ATopLeft);
+    (new GuiLabel(closed_box, "COMMS_BROKEN_LABEL", "Communications channel closed", 40))->setSize(GuiElement::GuiSizeMax, GuiElement::GuiSizeMax)->setPosition(0, 0, ATopLeft);
 
     // Button to acknowledge closed communications.
-    (new GuiButton(closed_box, "COMMS_BROKEN_OK", "Ok", []() {
+    (new GuiButton(closed_box, "COMMS_CLOSED_OK", "Ok", []() {
         if (my_spaceship)
             my_spaceship->commandCloseTextComm();
-    }))->setSize(150, 50)->setPosition(-20, -10, ABottomRight);
+    }))->setSize(100, 50)->setPosition(-20, -10, ABottomRight);
 
     // Panel for chat communications with GMs and other player ships.
     chat_comms_box = new GuiPanel(owner, "COMMS_CHAT_BOX");
@@ -110,6 +112,15 @@ GuiCommsOverlay::GuiCommsOverlay(GuiContainer* owner)
             my_spaceship->commandCloseTextComm();
     });
     chat_comms_close_button->setTextSize(20)->setPosition(-10, 0, ATopRight)->setSize(70, 30);
+    
+    if (!engine->getObject("mouseRenderer")) //If we are a touch screen, add a on screen keyboard.
+    {
+        OnScreenKeyboardControl* keyboard = new OnScreenKeyboardControl(chat_comms_box, chat_comms_message_entry);
+        keyboard->setPosition(20, -20, ABottomLeft)->setSize(760, 200);
+        chat_comms_message_entry->setPosition(20, -220, ABottomLeft);
+        chat_comms_send_button->setPosition(-20, -220, ABottomRight);
+        chat_comms_text->setSize(chat_comms_text->getSize().x, chat_comms_text->getSize().y - 200);
+    }
 
     // Panel for scripted comms with objects.
     script_comms_box = new GuiPanel(owner, "COMMS_SCRIPT_BOX");

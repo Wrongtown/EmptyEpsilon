@@ -117,6 +117,7 @@ public:
     ECommsState getCommsState() { return comms_state; }
     float getCommsOpeningDelay() { return comms_open_delay; }
     const std::vector<string>& getCommsReplyOptions() const { return comms_reply_message; }
+    P<SpaceObject> getCommsTarget() { return comms_target; }
     const string& getCommsTargetName() { return comms_target_name; }
     const string& getCommsIncommingMessage() { return comms_incomming_message; }
     bool hailCommsByGM(string target_name);
@@ -181,6 +182,7 @@ public:
     float getNetPowerUsage();
 
     void addToShipLog(string message, sf::Color color);
+    void addToShipLogBy(string message, P<SpaceObject> target);
     const std::vector<ShipLogEntry>& getShipsLog() const;
     
     void transferPlayersToShip(P<PlayerSpaceship> other_ship);
@@ -197,6 +199,8 @@ public:
 
     int getRepairCrewCount();
     void setRepairCrewCount(int amount);
+
+    virtual void drawOnGMRadar(sf::RenderTarget& window, sf::Vector2f position, float scale, bool long_range) override;
 
     EAlertLevel getAlertLevel() { return alert_level; }
 
